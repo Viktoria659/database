@@ -4,18 +4,22 @@ CREATE SCHEMA IF NOT EXISTS bank AUTHORIZATION ${bank_user};
 
 CREATE TABLE IF NOT EXISTS bank.client
 (
-  id   SERIAL NOT NULL UNIQUE,
+  id   BIGINT NOT NULL UNIQUE,
   name text   NOT NULL,
   age  SMALLINT,
   primary key (id)
 );
+
+Create sequence if not exists bank.client_id_seq START 1;
+Alter table bank.client
+  Alter column id set default nextval('bank.client_id_seq');
 
 ALTER TABLE bank.client
   OWNER to ${auth_user};
 
 CREATE TABLE IF NOT EXISTS bank.account
 (
-  id        SERIAL  NOT NULL UNIQUE,
+  id        BIGINT  NOT NULL UNIQUE,
   client_id INTEGER NOT NULL,
   balance   INTEGER NOT NULL,
   primary key (id),
@@ -25,12 +29,16 @@ CREATE TABLE IF NOT EXISTS bank.account
     ON DELETE NO ACTION
 );
 
+Create sequence if not exists bank.account_id_seq START 1;
+Alter table bank.account
+  Alter column id set default nextval('bank.account_id_seq');
+
 ALTER TABLE bank.account
   OWNER to ${auth_user};
 
 CREATE TABLE IF NOT EXISTS bank.transaction
 (
-  id              SERIAL  NOT NULL UNIQUE,
+  id              BIGINT  NOT NULL UNIQUE,
   account_from_id INTEGER NOT NULL,
   account_to_id   INTEGER NOT NULL,
   count           INTEGER NOT NULL,
@@ -44,6 +52,10 @@ CREATE TABLE IF NOT EXISTS bank.transaction
     ON UPDATE NO ACTION
     ON DELETE NO ACTION
 );
+
+Create sequence if not exists bank.transaction_id_seq START 1;
+Alter table bank.transaction
+  Alter column id set default nextval('bank.transaction_id_seq');
 
 ALTER TABLE bank.transaction
   OWNER to ${auth_user};
