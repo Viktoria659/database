@@ -1,61 +1,38 @@
-CREATE USER ${bank_user} WITH PASSWORD '${bank_password}';
+-- Schema: auth
+CREATE SCHEMA IF NOT EXISTS auth AUTHORIZATION ${auth_user};
 
-CREATE SCHEMA IF NOT EXISTS bank AUTHORIZATION ${bank_user};
-
-CREATE TABLE IF NOT EXISTS bank.client
+-- Table: auth.role
+CREATE TABLE IF NOT EXISTS auth.roles
 (
-  id   BIGINT NOT NULL UNIQUE,
-  name text   NOT NULL,
-  age  SMALLINT,
-  primary key (id)
+    role_id BIGINT NOT NULL UNIQUE,
+    role    TEXT   NOT NULL UNIQUE,
+    primary key (role_id)
+    );
+
+INSERT INTO auth.roles
+VALUES ('1', 'ROLE_USER');
+
+Create sequence IF not exists auth.roles_id_seq START 2;
+Alter table auth.roles
+    Alter column role_id set default nextval('auth.roles_id_seq');
+
+ALTER TABLE auth.roles
+    OWNER to ${auth_user};
+
+-- Table: auth.usr
+CREATE TABLE IF NOT EXISTS auth.usr
+(
+    user_id  BIGINT NOT NULL UNIQUE,
+    username TEXT   NOT NULL UNIQUE,
+    password TEXT   NOT NULL,
+    active   BOOLEAN         DEFAULT true,
+    role     BIGINT NOT NULL DEFAULT 1 REFERENCES auth.roles (role_id),
+    PRIMARY KEY (user_id)
 );
 
-Create sequence if not exists bank.client_id_seq START 1;
-Alter table bank.client
-  Alter column id set default nextval('bank.client_id_seq');
+Create sequence IF not exists auth.usr_id_seq START 1;
+Alter table auth.usr
+    Alter column user_id set default nextval('auth.usr_id_seq');
 
-ALTER TABLE bank.client
-  OWNER to ${auth_user};
-
-CREATE TABLE IF NOT EXISTS bank.account
-(
-  id        BIGINT  NOT NULL UNIQUE,
-  client_id INTEGER NOT NULL,
-  balance   INTEGER NOT NULL,
-  primary key (id),
-  CONSTRAINT client_id FOREIGN KEY (client_id)
-    REFERENCES bank.client (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-);
-
-Create sequence if not exists bank.account_id_seq START 1;
-Alter table bank.account
-  Alter column id set default nextval('bank.account_id_seq');
-
-ALTER TABLE bank.account
-  OWNER to ${auth_user};
-
-CREATE TABLE IF NOT EXISTS bank.transaction
-(
-  id              BIGINT  NOT NULL UNIQUE,
-  account_from_id INTEGER NOT NULL,
-  account_to_id   INTEGER NOT NULL,
-  count           INTEGER NOT NULL,
-  primary key (id),
-  CONSTRAINT account_from_id FOREIGN KEY (account_from_id)
-    REFERENCES bank.account (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION,
-  CONSTRAINT account_to_id FOREIGN KEY (account_to_id)
-    REFERENCES bank.account (id) MATCH SIMPLE
-    ON UPDATE NO ACTION
-    ON DELETE NO ACTION
-);
-
-Create sequence if not exists bank.transaction_id_seq START 1;
-Alter table bank.transaction
-  Alter column id set default nextval('bank.transaction_id_seq');
-
-ALTER TABLE bank.transaction
-  OWNER to ${auth_user};
+ALTER TABLE auth.usr
+    OWNER to ${auth_user};
