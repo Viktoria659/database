@@ -40,8 +40,8 @@ ALTER TABLE auth.usr
 -- Schema: client
 CREATE SCHEMA IF NOT EXISTS client AUTHORIZATION ${client_user};
 
--- Table: client.account
-CREATE TABLE IF NOT EXISTS client.account
+-- Table: client.client
+CREATE TABLE IF NOT EXISTS client.client
 (
     client_id  BIGINT NOT NULL UNIQUE,
     user_id    BIGINT NOT NULL,
@@ -56,9 +56,9 @@ CREATE TABLE IF NOT EXISTS client.account
     ON DELETE NO ACTION
     );
 
-Create sequence IF not exists client.account_id_seq START 1;
-Alter table client.account
-    Alter column client_id set default nextval('client.account_id_seq');
+Create sequence IF not exists client.client_id_seq START 1;
+Alter table client.client
+    Alter column client_id set default nextval('client.client_id_seq');
 
-ALTER TABLE client.account
+ALTER TABLE client.client
     OWNER to ${bank_user};
